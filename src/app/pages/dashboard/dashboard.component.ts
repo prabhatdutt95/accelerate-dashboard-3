@@ -1,14 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import Chart from 'chart.js';
 
-// core components
-import {
-  chartOptions,
-  parseOptions,
-  chartExample1,
-  chartExample2
-} from "../../variables/charts";
-
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -24,8 +16,6 @@ export class DashboardComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    parseOptions(Chart, chartOptions());
-
     const chartSales1 = document.getElementById('chart-orders1');
     const chartSales2 = document.getElementById('chart-orders2');
 
