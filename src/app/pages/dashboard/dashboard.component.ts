@@ -1,67 +1,77 @@
 import { Component, OnInit } from '@angular/core';
 import Chart from 'chart.js';
-
+import { DataService } from '../../services/data.service';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
+  public graphData;
+  public tableData: any;
+  nodeDeatils;
+  public chart1;
+  public chart2;
 
-  public datasets: any;
-  public data: any;
-  public salesChart1;
-  public salesChart2;
-
-  constructor() { }
+  constructor(private dataService: DataService) { }
 
   ngOnInit() {
-    const chartSales1 = document.getElementById('chart-orders1');
-    const chartSales2 = document.getElementById('chart-orders2');
+    this.getGraphData();
+    this.getTableData();
+  }
 
-    this.salesChart1 = new Chart(chartSales1, {
+  async getGraphData() {
+    this.dataService.getGraphData().subscribe((data) => {
+      this.graphData = data;
+      this.createGraph(data);
+    });
+  }
+  createGraph(data) {
+    const chartSales1 = document.getElementById('totalHub');
+    const chartSales2 = document.getElementById('totalBrowserInstances');
+
+    this.chart1 = new Chart(chartSales1, {
       type: 'pie',
       data: {
         datasets: [{
           data: [
-            this.randomScalingFactor(),
-            this.randomScalingFactor(),
-            this.randomScalingFactor(),
-            this.randomScalingFactor(),
-            this.randomScalingFactor(),
+            data.totalActiveHubs,
+            data.totalHub - data.totalActiveHubs
           ],
-          backgroundColor: [ 'red', 'orange', 'yellow', 'green', 'blue'],
+          backgroundColor: ['#f5365c', '#8965e0'],
           label: 'Dataset 1'
         }],
-        labels: [ 'red', 'orange', 'yellow', 'green', 'blue']
+        labels: ['Available Hubs', 'Active Hubs']
       },
       options: {
         responsive: true
       }
     });
-    this.salesChart2 = new Chart(chartSales2, {
+    this.chart2 = new Chart(chartSales2, {
       type: 'pie',
       data: {
         datasets: [{
           data: [
-            this.randomScalingFactor(),
-            this.randomScalingFactor(),
-            this.randomScalingFactor(),
-            this.randomScalingFactor(),
-            this.randomScalingFactor(),
+            data.totalBrowserInstances - data.totalAvailableInstances,
+            data.totalAvailableInstances
           ],
-          backgroundColor: [ 'red', 'orange', 'yellow', 'green', 'blue'],
+          backgroundColor: ['#11cdef', '#fb6340'],
           label: 'Dataset 1'
         }],
-        labels: [ 'red', 'orange', 'yellow', 'green', 'blue']
+        labels: ['Available Instance', 'Active Instance']
       },
       options: {
         responsive: true
       }
     });
   }
-  randomScalingFactor() {
-    return Math.round(Math.random() * 100);
-  }
 
+  getTableData() {
+    this.dataService.getTableData().subscribe((data) => {
+      this.tableData = data;
+      this.tableData.forEach(element => {
+        this.nodeDeatils = Object.keys(element.hub.node[0]);
+      });
+    });
+  }
 }
